@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Warehouse - orders history</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+</head>
+<body class="bg-light">
+
+<!-- Верхняя навигационная панель склада - Upper navigation bar for warehouse management -->
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>📋 Orders History</h2>
+        <div>
+            <a href="/orders" class="btn btn-primary">Orders</a>
+            <a href="/products" class="btn btn-outline-primary">Item stock</a>
+            <a href="/" class="btn btn-outline-secondary">Back to website</a>
+        </div>
+    </div>
+
+    <!-- таблица, которая отображает выполненные заказы - table, which contains information about completed orders -->
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <table class="table table-bordered align-middle mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Order №</th>
+                    <th>Date</th>
+                    <th>Item</th>
+                    <th>Quantity</th>
+                    <th>Customer</th>
+                    <th>Email</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            <!-- Перебираем выполненные заказы Map<String, List<Order>> - iterate over completed orders Map<String, List<Order>> -->
+            <th:block th:each="entry : ${completedOrders}">
+                <tr th:each="item, iterStat : ${entry.value}">
+
+                    <!-- Номер заказа - order number  -->
+                    <td th:if="${iterStat.first}"
+                        th:rowspan="${#lists.size(entry.value)}"
+                        class="fw-bold align-middle bg-white"
+                        th:text="${entry.key}">
+                    </td>
+                    <!-- Дата заказа  - date of order  -->
+                    <td th:if="${iterStat.first}"
+                        th:rowspan="${#lists.size(entry.value)}"
+                        class="align-middle bg-white"
+                        th:text="${#temporals.format(entry.value[0].orderDate, 'dd-MM-yyyy HH:mm')}">
+                    </td>
+
+                    <!-- Название товара  - item name  -->
+                    <td th:text="${item.productName}">Item</td>
+
+                    <!-- Количество  - quantity  -->
+                    <td th:text="${item.productQuantity}" class="text-center fw-bold">1</td>
+
+                    <!-- Имя покупателя  - customer name  -->
+                    <td th:if="${iterStat.first}"
+                        th:rowspan="${#lists.size(entry.value)}"
+                        class="align-middle bg-white"
+                        th:text="${entry.value[0].customerName}">Name</td>
+
+                    <!-- Email покупателя  - customer email  -->
+                    <td th:if="${iterStat.first}"
+                        th:rowspan="${#lists.size(entry.value)}"
+                        class="align-middle bg-white"
+                        th:text="${entry.value[0].customerEmail}">Email</td>
+
+                <!-- Кнопка удаления  - delete button  -->
+                <td th:if="${iterStat.first}"
+                    th:rowspan="${#lists.size(entry.value)}"
+                    class="align-middle text-center bg-white">
+
+                    <form th:action="@{/warehouse/history/delete/{orderNumber}(orderNumber=${entry.key})}" method="post">
+                        <button type="submit"
+                                class="btn btn-sm btn-outline-danger">
+                            🗑️ Delete
+                        </button>
+                    </form>
+                </td>
+                </tr>
+            </th:block>
+            <!-- Сообщение, если история пуста - message if history is empty -->
+            <tr th:if="${#maps.isEmpty(completedOrders)}">
+                <td colspan="7" class="text-center py-4 text-muted">History is empty. No completed orders yet.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+</body>
+</html>

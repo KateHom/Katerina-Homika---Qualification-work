@@ -1,0 +1,20 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${store}"></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" />
+</head>
+<body>
+
+<header th:insert="~{website/header :: header}"></header>
+
+<div class="container" mt-5>
+    <h1 th:text="${store}"></h1>
+    <p th:text="${'If you need help with the website, please email this address: katerinahomika@inbox.lv or call +37126650665'}"></p>
+</div>
+
+<div th:insert="~{website/footer :: footer}"></div>>
+
+</body>
+</html>

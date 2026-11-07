@@ -1,0 +1,24 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${store}"></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" />
+</head>
+<body>
+
+<header th:insert="~{website/header :: header}"></header>
+
+<!-- контейнер с текстом - container with text -->
+<div class="container mt-5">
+    <h1 th:text="${store}"></h1>
+    <p th:text="${'This website was developed for Qualification Work in Turiba University.'}"></p>
+    <p th:text="${'Developer is student Katerina Homika.'}"></p>
+    <p th:text="${'The main aim of this website is to show, that, if some company decided to create the website, need to introduce item availabilty for clients.'}"></p>
+    <p th:text="${'It is not hard to do, but it will be much easier for clients understand, how much item company has on the warehouse.'}"></p>
+</div>
+
+<div th:insert="~{website/footer :: footer}"></div>>
+
+</body>
+</html>
