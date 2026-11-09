@@ -29,7 +29,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/cart/**", "/about/**", "/support/**").permitAll()
                         .requestMatchers("/orders/**").hasRole("ADMIN")
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .formLogin(Customizer.withDefaults());
         return http.build();
