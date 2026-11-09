@@ -6,6 +6,7 @@ import com.example.qualificationwork.models.OrderStatus;
 import com.example.qualificationwork.models.Product;
 import com.example.qualificationwork.repository.OrderRepository;
 import com.example.qualificationwork.repository.ProductRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -64,22 +65,6 @@ public class CartService {
         if (cart.getItems().isEmpty()) {
             return;
         }
-        // Проверяем наличие каждого товара
-        // check if item is available
-        for (Map.Entry<Long, Integer> entry : cart.getItems().entrySet()) {
-            Long productId = entry.getKey();
-            Integer requestedQuantity = entry.getValue();
-
-            Product product = productRepository.findById(productId)
-                    .orElseThrow(() -> new IllegalArgumentException("Product not found"));
-
-            if (requestedQuantity > product.getQuantity()) {
-                throw new IllegalArgumentException(
-                        "Not enough stock for " + product.getName() +
-                                ". Available: " + product.getQuantity() + ", requested: " + requestedQuantity
-                );
-            }
-
         LocalDateTime commonOrderDate = LocalDateTime.now();
         // Форматируем дату в вид "28092026"
         // formate date for order like "28092026"
@@ -88,6 +73,22 @@ public class CartService {
         // Переменная для хранения ЕДИНОГО номера заказа для всей корзины
         // Variable for storing a SINGLE order number for the entire cart
         String commonOrderNumber = null;
+
+        // Проверяем наличие каждого товара
+        // check if item is available
+        for (Map.Entry<Long, Integer> entry : cart.getItems().entrySet()) {
+            Long productId = entry.getKey();
+            Integer requestedQuantity = entry.getValue();
+
+            // Получаем товар с пессимистичной блокировкой (SELECT ... FOR UPDATE)
+            Product product = productRepository.findByIdWithLock(productId)
+                    .orElseThrow(() -> new EntityNotFoundException("Product not found"));
+
+            // Проверяем, хватает ли товара на складе прямо в заблокированной транзакции
+            if (product.getQuantity() <= 0) {
+                throw new IllegalArgumentException("Not enough stock for " + product.getName() +
+                        ". Available: " + product.getQuantity() + ", requested: " + requestedQuantity);
+            }
 
             // Списание со склада
             // Write-off from warehouse
@@ -118,6 +119,8 @@ public class CartService {
             // Assign the generated single number and update the record
             savedOrder.setOrderNumber(commonOrderNumber);
             orderRepository.save(savedOrder);
+
+
         }
     }
 }
